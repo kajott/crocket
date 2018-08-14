@@ -1,0 +1,6 @@
+- documentation
+- per-track "current key" cache to avoid bisection every time?
+- RPS value in CTF&XML, or not?
+- XML saving?
+- XML loading?
+- format rocket-protocol.txt in Markdown/Markdeep

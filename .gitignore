@@ -1,0 +1,7 @@
+crocket*.exe
+Debug*
+Release*
+*.user
+*.ilk
+*.pdb
+.vs
