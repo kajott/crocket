@@ -593,7 +593,9 @@ void crocket_set_mode(int mode) {
     crocket_mode = mode;
     if (mode == CROCKET_MODE_PLAYER) {
         disconnect();
-        crocket_current_state |= CROCKET_STATE_PLAYING | CROCKET_EVENT_PLAY;
+        if (!(crocket_current_state & CROCKET_STATE_PLAYING)) {
+            crocket_current_state |= CROCKET_STATE_PLAYING | CROCKET_EVENT_PLAY;
+        }
     }
 #else // CROCKET_PLAYER_ONLY
     (void) mode;
