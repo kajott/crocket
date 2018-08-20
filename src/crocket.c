@@ -409,7 +409,7 @@ static void reconnect(void) {
 ///// CORE API                                                            /////
 ///////////////////////////////////////////////////////////////////////////////
 
-int crocket_init(const char* save_file, const void* data, float rpm) {
+int crocket_init(const char* save_file, const void* track_data, float rpm) {
 #ifndef CROCKET_PLAYER_ONLY
     char* host;
 #endif
@@ -467,7 +467,7 @@ int crocket_init(const char* save_file, const void* data, float rpm) {
 
         // load track data from file
         void* loaded_data = NULL;
-        if (save_file && save_file[0] && !data) {
+        if (save_file && save_file[0] && !track_data) {
             FILE *f = fopen(save_file, "rb");
             if (f) {
                 size_t s;
@@ -476,13 +476,13 @@ int crocket_init(const char* save_file, const void* data, float rpm) {
                 fseek(f, 0, SEEK_SET);
                 loaded_data = malloc(s);
                 if (loaded_data && (fread(loaded_data, 1, s, f) == s)) {
-                    data = loaded_data;
+                    track_data = loaded_data;
                 }
             }
         }
 
         // import track data (from file or provided buffer)
-        load_data(data);
+        load_data(track_data);
         free(loaded_data);        
 #ifndef CROCKET_PLAYER_ONLY
     }
@@ -552,7 +552,7 @@ int crocket_update(float *p_time) {
     if ((crocket_current_state & CROCKET_EVENT_SAVE)
     && crocket_save_file && crocket_save_file[0]) {
         int size = 0;
-        void* data = crocket_get_data(&size);
+        void* data = crocket_get_track_data(&size);
         if (data && (size > 0)) {
             FILE *f = fopen(crocket_save_file, "wb");
             if (f) {
@@ -666,7 +666,7 @@ inline unsigned char* put_leb128(unsigned char* pos, unsigned int val) {
     return pos;
 }
 
-void* crocket_get_data(int *p_size) {
+void* crocket_get_track_data(int *p_size) {
     const crocket_track_t* t;
     const crocket_key_t* k;
     void* data;

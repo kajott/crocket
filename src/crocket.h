@@ -34,10 +34,11 @@ extern "C" {
 #undef var
 
 //! initialize the Rocket client
-//! \param save_file  name of a file to load and save track data from;
-//!                   if NULL, the application must handle CROCKET_EVENT_SAVE
-//!                   itself
-//! \param data  a track data dump; if NULL, data is loaded from save_file
+//! \param save_file   name of a file to load and save track track data from;
+//!                    if NULL, the application must handle CROCKET_EVENT_SAVE
+//!                    itself
+//! \param track_data  a track data dump;
+//!                    if NULL, track data is loaded from save_file
 //! \param rpm   the demo's speed in rows per minute for timestamp conversion
 //!              (i.e. beats per minute * rows per beat);
 //!              use CROCKET_TIME_IN_ROWS to work directly with rows
@@ -48,7 +49,7 @@ extern "C" {
 //! \note If the server could not be reached, the application falls back into
 //!       player mode and will never try to reach the server again. In other
 //!       words, the server must already run when crocket_init() is called.
-extern int crocket_init(const char* save_file, const void* data, float rpm);
+extern int crocket_init(const char* save_file, const void* track_data, float rpm);
 // possible return values of crocket_init():
 #define CROCKET_MODE_PLAYER 0  //!< player ("standalone") mode
 #define CROCKET_MODE_CLIENT 1  //!< client ("slave") mode
@@ -97,7 +98,7 @@ extern void crocket_set_mode(int mode);
 //! \returns a pointer to the produced track data,
 //!          to be free()'d by the application
 //! \note always returns NULL and zero size in CROCKET_PLAYER_ONLY mode
-extern void* crocket_get_data(int *p_size);
+extern void* crocket_get_track_data(int *p_size);
 
 #ifdef __cplusplus
 }

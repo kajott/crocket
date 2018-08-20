@@ -109,11 +109,11 @@ The application doesn't really need to care about modes; all it needs to do is s
 
 Track data is loaded in `crocket_init` and saved whenever the "save data" command is received in client mode (in most editors, this can be sent with Ctrl+E).
 
-If the `data` parameter to `crocket_init` is not `NULL`, track data will be loaded from memory at the specified address, regardless of the value of `save_file`.
+If the `track_data` parameter to `crocket_init` is not `NULL`, track data will be loaded from memory at the specified address, regardless of the value of `save_file`.
 
-If `save_file` is specified (i.e. neither `NULL` nor an empty string), the specified file name is used to load track data in player mode (unless `data` is specified) and save it back to disk on user request. In this case, the servers's "remote save" command is handled transparently in the library.
+If `save_file` is specified (i.e. neither `NULL` nor an empty string), the specified file name is used to load track data in player mode (unless `track_data` is specified) and save it back to disk on user request. In this case, the servers's "remote save" command is handled transparently in the library.
 
-If `save_file` is not specified, track data can only be loaded from the `data` parameter; if this is unspecified too, player mode won't work in a meaningful manner, as all tracks will be empty. Saving can't be handled by the library itself either, but the application can react on `CROCKET_EVENT_SAVE` and use the `crocket_get_data` function to get an in-memory dump of the track file data and implement some other means of data persistence.
+If `save_file` is not specified, track data can only be loaded from the `track_data` parameter; if this is unspecified too, player mode won't work in a meaningful manner, as all tracks will be empty. Saving can't be handled by the library itself either, but the application can react on `CROCKET_EVENT_SAVE` and use the `crocket_get_track_data` function to get an in-memory dump of the track file data and implement some other means of data persistence.
 
 A custom binary data format ("CTF" - Compact Track Format) is used for the load and save operations. This is a simple, but rather compact representation of the track data, using variable-length integers and delta coding for timestamps. All tracks are combined into a single data stream. Track data of the Rocket reference implementation is not supported.
 
@@ -153,6 +153,6 @@ If the preprocessor define `CROCKET_PLAYER_ONLY` is set during compilation, ever
 
 - `crocket_init` doesn't try to establish a server connection, it always starts up in player mode and returns `CROCKET_MODE_PLAYER`
 - `crocket_set_mode` is a no-op, i.e. switching to client mode is not possible
-- `crocket_get_data` always returns a `NULL` pointer and a size of zero
+- `crocket_get_track_data` always returns a `NULL` pointer and a size of zero
 
 Note that the API remains exactly the same, even if compiled with `CROCKET_PLAYER_ONLY`.
