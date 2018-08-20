@@ -2,8 +2,8 @@
 
 > **Note:** If you don't know what GNU Rocket is or what it's good for, this document won't be useful to you. If you just want to use GNU Rocket, it won't be useful either. However, if you're planning to implement a new GNU Rocket client and don't want to spend the hour it takes to study the source code and reverse-engineer the protocol, you're at the right spot here.
 
-Client = the demo
-Server = the editor
+- Client = the demo
+- Server = the editor
 
 All track data is managed in the **client**. The server is basically just a GUI.
 
@@ -26,6 +26,7 @@ Requests the client to add or update a keyframe.
 |      5 | UINT32  | row number |
 |      9 | FLOAT32 | the keyframe's value |
 |     13 | UINT8   | interpolation type (described below) |
+
 total message size: 14 bytes
 
 
@@ -37,6 +38,7 @@ Requests the client to delete a keyframe.
 |      0 | UINT8   | fixed value 1 (`DELETE_KEY` command) |
 |      1 | UINT32  | track index |
 |      5 | UINT32  | row number |
+
 total message size: 9 bytes
 
 
@@ -48,6 +50,7 @@ Requests the data of a whole track from the server.
 |      0 | UINT8   | fixed value 2 (`GET_TRACK` command) |
 |      1 | UINT32  | length of the track name |
 |      5 | string  | the raw track name (without any terminating bytes) |
+
 total message size: 5 bytes + track name length
 
 > **Note:** Older versions of the protocol (including the one that ships as part of the "0.9" release version) transmit an additional UINT32 before the track name length (i.e. at offset 1). This is the explicit index of the track.
@@ -60,6 +63,7 @@ Requests the client to jump to a specific position.
 | ------ | ------- | ----------- |
 |      0 | UINT8   | fixed value 3 (`SET_ROW` command) |
 |      1 | UINT32  | desired row number |
+
 total message size: 5 bytes
 
 
@@ -70,6 +74,7 @@ Informs the server about the client's current playback position.
 | ------ | ------- | ----------- |
 |      0 | UINT8   | fixed value 3 (`SET_ROW` command) |
 |      1 | UINT32  | current row number |
+
 total message size: 5 bytes
 
 
@@ -80,6 +85,7 @@ Informs the client that it shall pause or resume playback.
 | ------ | ------- | ----------- |
 |      0 | UINT8   | fixed value 4 (`PAUSE` command) |
 |      1 | UINT8   |  nonzero for "pause", zero for "resume playback" |
+
 total message size: 2 bytes
 
 
@@ -89,6 +95,7 @@ Informs the client that it shall save the track data to disk.
 | Offset | Type    | Description |
 | ------ | ------- | ----------- |
 |      0 | UINT8   | fixed value 5 (`SAVE_TRACKS` command) |
+
 total message size: 1 byte
 
 
@@ -100,6 +107,7 @@ Informs the client about an arbitrary event, e.g. a debug keypress.
 | ------ | ------- | ----------- |
 |      0 | UINT8   | fixed value 6 (`ACTION` command) |
 |      1 | UINT32  | current row number |
+
 total message size: 5 bytes
 
 
