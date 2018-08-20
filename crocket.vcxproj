@@ -365,14 +365,12 @@
     <ClCompile Include="example/crocket_test.c" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="rocket-protocol.txt" />
-    <Text Include="TODO.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include=".gitignore" />
     <None Include="build_linux.sh" />
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include="rocket-protocol.md" />
+    <None Include="TODO.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
