@@ -24,8 +24,12 @@
 // SOFTWARE.
 
 #ifdef _WIN32
+    #ifndef _CRT_NONSTDC_NO_WARNINGS
     #define _CRT_NONSTDC_NO_WARNINGS  // MSVC: accept _strdup
+    #endif
+    #ifndef _CRT_SECURE_NO_WARNINGS
     #define _CRT_SECURE_NO_WARNINGS   // MSVC: accept fopen
+    #endif
     #define WIN32_LEAN_AND_MEAN
     #include <windows.h>
     #include <WinSock2.h>
