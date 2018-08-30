@@ -142,9 +142,11 @@ if (res & CROCKET_EVENT_DISCONNECT) {
 After switching to player mode, no reconnect attempts will be made, until switching back to server mode again. `CROCKET_EVENT_PLAY` is generated when switching from client mode to player mode in paused state.
 
 
-### Timed Variable Queries
+### Timed Variable Queries and Low-Level API
 
 In addition to the automatic updates that are done by `crocket_update`, the `crocket_get_value` function can be used to query the value of a specific variable at an arbitrary time.
+
+Some of the internal data structures of crocket are exposed via a low-level API that provides direct read access to the track and keyframe data. This allows more complex queries than the normal `crocket_uodate` and `crocket_get_value` function can provide.
 
 
 ### Player-Only Mode

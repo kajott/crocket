@@ -33,6 +33,11 @@ extern "C" {
 #include "crocket_vars.h"
 #undef var
 
+
+//////////////////////////////////////////////////////////////////////////////
+///// PUBLIC API (high-level)                                            /////
+//////////////////////////////////////////////////////////////////////////////
+
 //! initialize the Rocket client
 //! \param save_file   name of a file to load and save track track data from;
 //!                    if NULL, the application must handle CROCKET_EVENT_SAVE
@@ -99,6 +104,54 @@ extern void crocket_set_mode(int mode);
 //!          to be free()'d by the application
 //! \note always returns NULL and zero size in CROCKET_PLAYER_ONLY mode
 extern void* crocket_get_track_data(int *p_size);
+
+
+//////////////////////////////////////////////////////////////////////////////
+///// LOW-LEVEL API (for direct track data access)                       /////
+//////////////////////////////////////////////////////////////////////////////
+
+//! data for a single keyframe
+typedef struct _key {
+    unsigned int row;        //!< keyframe time (in rows, not seconds!)
+    float value;             //!< keyframe value
+    unsigned char interpol;  //!< interpolation mode (0=none, 1=linear, 2=smoothstep, 3=quadratic)
+} crocket_key_t;
+
+//! data for a whole track
+typedef struct _track {
+    float *p_var;         //!< pointer to the associated variable
+    const char* name;     //!< name of the track
+    unsigned int nkeys;   //!< number of valid keyframes
+    unsigned int alloc;   //!< current capacity of the 'keys' array
+    crocket_key_t* keys;  //!< keyframe data
+} crocket_track_t;
+
+//! conversion factor from seconds to rows, as set up in crocket_init()
+//! \note rows = seconds * crocket_timescale
+extern float crocket_timescale;
+
+//! find a specific track by its variable
+//! \param p_var  pointer to the variable of the track to locate
+//! \returns the desired track, or NULL if not found
+extern const crocket_track_t* crocket_find_track(const float* p_var);
+
+//! find the position of a specific keyframe segment in the keys of a track
+//! \param t    the track to query
+//! \param row  the row number to search
+//! \returns The index of the keyframe segment in the 'keys' array of the
+//!          track, plus one, i.e.:
+//!       \n - 0 if 'row' is before the first keyframe
+//!       \n - n if 'row' is exactly at keyframe n-1, or between n-1 and n
+//!       \n - 'nkeys' if 'row' is after the last keyframe
+extern unsigned int crocket_find_key(const crocket_track_t* t, unsigned int row);
+
+//! sample a value from a track at a specific point in time
+//! \param t    the track to query
+//! \param row  the time to query (in rows)
+//! \returns the requested value
+extern float crocket_sample(const crocket_track_t* t, float row);
+
+//////////////////////////////////////////////////////////////////////////////
 
 #ifdef __cplusplus
 }

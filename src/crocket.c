@@ -59,20 +59,6 @@
 #include "crocket_vars.h"
 #undef var
 
-typedef struct _key {
-    unsigned int row;
-    float value;
-    unsigned char interpol;
-} crocket_key_t;
-
-typedef struct _track {
-    float *p_var;
-    const char* name;
-    unsigned int nkeys;
-    unsigned int alloc;
-    crocket_key_t* keys;
-} crocket_track_t;
-
 crocket_track_t crocket_tracks[] = {
 #define var(s,n) { &s, n, 0, 0, NULL },
 #include "crocket_vars.h"
@@ -102,11 +88,19 @@ static void load_data(const unsigned char* pos);
 ///// TRACK DATA ACCESS AND MANIPULATION                                  /////
 ///////////////////////////////////////////////////////////////////////////////
 
-// get index of key that corresponds to a specific row, *plus 1*
-// (so 0 = before first key)
-static unsigned int find_key(const crocket_track_t* t, unsigned int row) {
+const crocket_track_t* crocket_find_track(const float* p_var) {
+    const crocket_track_t* t;
+    for (t = crocket_tracks;  t->name;  ++t) {
+        if (t->p_var == p_var) {
+            return t;
+        }
+    }
+    return NULL;
+}
+
+unsigned int crocket_find_key(const crocket_track_t* t, unsigned int row) {
     unsigned int a, b, c, pivot;
-    if (!t->nkeys || (row < t->keys[0].row)) {
+    if (!t || !t->nkeys || (row < t->keys[0].row)) {
         return 0;  // before first key
     }
     a = 0;
@@ -123,12 +117,12 @@ static unsigned int find_key(const crocket_track_t* t, unsigned int row) {
     return a + 1;
 }
 
-static float sample(const crocket_track_t* t, float row) {
+float crocket_sample(const crocket_track_t* t, float row) {
     const crocket_key_t* k;
     unsigned int pos;
     float x;
-    if (!t->nkeys) { return 0.0f; }  // empty track
-    pos = find_key(t, (row <= 0.0f) ? 0 : (unsigned int)row);
+    if (!t || !t->nkeys) { return 0.0f; }  // empty track
+    pos = crocket_find_key(t, (row <= 0.0f) ? 0 : (unsigned int)row);
     if (!pos) { return t->keys[0].value; }  // before first key
     k = &t->keys[pos-1];
     if ((pos >= t->nkeys) || !k[0].interpol) { return k[0].value; }  // after last key, or uninterpolated
@@ -150,7 +144,7 @@ static void set_key(unsigned int track_index, unsigned int row, float value, uns
     unsigned int pos;
     if (track_index >= ntracks) { return; }
     t = &crocket_tracks[track_index];
-    pos = find_key(t, row);
+    pos = crocket_find_key(t, row);
 
     // update existing key
     if (pos && (t->keys[pos-1].row == row)) {
@@ -187,7 +181,7 @@ static void delete_key(unsigned int track_index, unsigned int row) {
     unsigned int pos;
     if (track_index >= ntracks) { return; }
     t = &crocket_tracks[track_index];
-    pos = find_key(t, row);
+    pos = crocket_find_key(t, row);
     if (!pos || (t->keys[pos-1].row != row)) {
         return;  // no such key
     }
@@ -570,7 +564,7 @@ int crocket_update(float *p_time) {
 
     // sample current value for all tracks
     for (t = crocket_tracks;  t->name;  ++t) {
-        *t->p_var = sample(t, row);
+        *t->p_var = crocket_sample(t, row);
     }
 
     // done -- return state/event bitmask and clear the event part of it,
@@ -581,13 +575,7 @@ int crocket_update(float *p_time) {
 }
 
 float crocket_get_value(const float* p_var, float time) {
-    const crocket_track_t* t;
-    for (t = crocket_tracks;  t->name;  ++t) {
-        if (t->p_var == p_var) {
-            return sample(t, time * crocket_timescale);
-        }
-    }
-    return 0.0f;
+    return crocket_sample(crocket_find_track(p_var), time * crocket_timescale);
 }
 
 void crocket_set_mode(int mode) {
